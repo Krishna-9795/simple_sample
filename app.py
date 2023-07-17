@@ -94,7 +94,7 @@ def update_user(user_id):
     }
     return jsonify(result), 200
 
-
+#delete
 @app.route('/users/delete', methods=['DELETE'])
 def delete_user(user_id):
     user = User.query.get(user_id)
