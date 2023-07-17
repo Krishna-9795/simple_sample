@@ -9,13 +9,13 @@ db=SQLAlchemy()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:krishna123@localhost/sample'
 
 class User(db.Model):
-    Id = db.Column(db.Integer, primary_key=True)
-    First_name = db.Column(db.String(50))
-    Last_name= db.Column(db.String(50))
-    Mobile=db.Column(db.Integer,unique=True)
-    Created_at=db.Column(db.DateTime, server_default=db.func.now())
-    Updated_at=db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
-    image=db.column(db.String(100))
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50))
+    last_name= db.Column(db.String(50))
+    mobile=db.Column(db.Integer,unique=True)
+    created_at=db.Column(db.DateTime, server_default=db.func.now())
+    updated_at=db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+    image_url=db.Column(db.String(100))
     
     def __init__(self, first_name, last_name, mobile, image=None):
         self.first_name = first_name
@@ -37,7 +37,7 @@ def get_users():
             'mobile': user.mobile,
             'created_at': user.created_at,
             'updated_at': user.updated_at,
-            'image': user.image
+            'image_url': user.image_url
         })
     return jsonify(result), 200
         
@@ -64,7 +64,7 @@ def create_user():
         'mobile': new_user.mobile,
         'created_at': new_user.created_at,
         'updated_at': new_user.updated_at,
-        'image': new_user.image
+        'image_url': new_user.image_url
     }
     return jsonify(result), 201
 
@@ -90,7 +90,8 @@ def update_user(user_id):
         'last_name': user.last_name,
         'mobile': user.mobile,
         'created_at': user.created_at,
-        'updated_at': user.updated_at
+        'updated_at': user.updated_at,
+        'image_url':user.image_url
     }
     return jsonify(result), 200
 
