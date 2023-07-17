@@ -12,16 +12,16 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50))
     last_name= db.Column(db.String(50))
-    mobile=db.Column(db.Integer,unique=True)
+    mobile=db.Column(db.String(20),unique=True)
     created_at=db.Column(db.DateTime, server_default=db.func.now())
     updated_at=db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
     image_url=db.Column(db.String(100))
     
-    def __init__(self, first_name, last_name, mobile, image=None):
+    def __init__(self, first_name, last_name, mobile, image_url=None):
         self.first_name = first_name
         self.last_name = last_name
         self.mobile = mobile
-        self.image = image
+        self.image_url = image_url
         
         
 #for reading the data in the fields
@@ -48,12 +48,12 @@ def create_user():
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     mobile = data.get('mobile')
-    image = data.get('image')
+    image_url = data.get('image_url')
 
     if not first_name or not last_name or not mobile:
         return jsonify(error='Missing required fields'), 400
 
-    new_user = User(first_name=first_name, last_name=last_name, mobile=mobile, image=image)
+    new_user = User(first_name=first_name, last_name=last_name, mobile=mobile, image_url=image_url)
     db.session.add(new_user)
     db.session.commit()
     
