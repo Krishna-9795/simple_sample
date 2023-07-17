@@ -71,7 +71,7 @@ def create_user():
 
 
 #updating the table
-@app.route('/users/update', methods=['PUT'])
+@app.route('/users/update/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -96,7 +96,7 @@ def update_user(user_id):
     return jsonify(result), 200
 
 #delete
-@app.route('/users/delete', methods=['DELETE'])
+@app.route('/users/delete/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     user = User.query.get(user_id)
     if not user:
