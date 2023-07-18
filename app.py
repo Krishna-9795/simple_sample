@@ -1,6 +1,10 @@
 from flask import Flask ,jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import os
+import uuid
+from werkzeug.utils import secure_filename  
+import datetime
 
 
 app=Flask(__name__)
@@ -49,6 +53,7 @@ def create_user():
     last_name = data.get('last_name')
     mobile = data.get('mobile')
     image_url = data.get('image_url')
+    
 
     if not first_name or not last_name or not mobile:
         return jsonify(error='Missing required fields'), 400
@@ -68,16 +73,34 @@ def create_user():
     }
     return jsonify(result), 201
 
+#uploading images
+@app.route('/uploads', methods=['POST'])
+def upload():
+    file = request.files['image']
+    if file:
+        filename = secure_filename(file.filename)#type:ignore
+        unique_filename = generate_unique_filename(filename)
+        file.save(os.path.join('uploads', unique_filename))
+        return 'Image uploaded successfully!'
+    return 'No image file provided.'
+
+def generate_unique_filename(filename):
+    unique_id = str(uuid.uuid4().hex)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    _, extension = os.path.splitext(filename)
+    unique_filename = f"{timestamp}_{unique_id}{extension}"
+    return unique_filename
 
 
 #updating the table
 @app.route('/users/update/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
+    data = request.get_json()
     user = User.query.get(user_id)
     if not user:
         return jsonify(error='User not found'), 404
 
-    data = request.get_json()
+    user.id = data.get('id',user.id)
     user.first_name = data.get('first_name', user.first_name)
     user.last_name = data.get('last_name', user.last_name)
     user.mobile = data.get('mobile', user.mobile)
