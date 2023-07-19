@@ -61,6 +61,7 @@ def login():
     
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True)
     first_name = db.Column(db.String(50))
     last_name= db.Column(db.String(50))
     mobile=db.Column(db.String(20),unique=True)
@@ -68,11 +69,38 @@ class User(db.Model):
     updated_at=db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
     image_url=db.Column(db.String(100))
     
-    def __init__(self, first_name, last_name, mobile, image_url=None):
+    def __init__(self,username,first_name, last_name, mobile, image_url=None):
+        self.username = username
         self.first_name = first_name
         self.last_name = last_name
         self.mobile = mobile
         self.image_url = image_url
+
+
+
+@app.route('/profile', methods=['GET'])
+@jwt_required()
+def get_user_profile():
+    user_id = get_jwt_identity()
+    user_log = User_log.query.get(user_id)
+
+    if not user_log:
+        return jsonify({'message': 'User not found'}), 404
+    user=User.query.filter_by(username=user_log.username).first()
+    
+    if not user:
+        return jsonify({'message': 'Invalid username or password.'}), 401
+    
+    profile_data = {
+        'username': user.username,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'mobile': user.mobile,
+        'image_url': user.image_url
+    }
+
+    return jsonify(profile_data), 200
+
         
         
 #for reading the data in the fields
@@ -92,11 +120,14 @@ def get_users():
             'image_url': user.image_url
         })
     return jsonify(result), 200
-        
+
+
+
 #creating an id and entering the details      
 @app.route('/users/create', methods=['POST'])
 def create_user():
     data = request.get_json()
+    username=data.get('username')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     mobile = data.get('mobile')
@@ -106,7 +137,7 @@ def create_user():
     if not first_name or not last_name or not mobile:
         return jsonify(error='Missing required fields'), 400
 
-    new_user = User(first_name=first_name, last_name=last_name, mobile=mobile, image_url=image_url)
+    new_user = User(username=username,first_name=first_name, last_name=last_name, mobile=mobile, image_url=image_url)
     db.session.add(new_user)
     db.session.commit()
     
@@ -149,6 +180,7 @@ def update_user(user_id):
         return jsonify(error='User not found'), 404
 
     user.id = data.get('id',user.id)
+    user.username=data.get('username',user.username)
     user.first_name = data.get('first_name', user.first_name)
     user.last_name = data.get('last_name', user.last_name)
     user.mobile = data.get('mobile', user.mobile)
