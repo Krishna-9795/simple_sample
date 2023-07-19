@@ -5,13 +5,60 @@ import os
 import uuid
 from werkzeug.utils import secure_filename  
 import datetime
-
+from flask_jwt_extended import JWTManager, jwt_required,create_access_token,get_jwt_identity
+from datetime import timedelta
 
 app=Flask(__name__)
 db=SQLAlchemy()
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:krishna123@localhost/sample'
+jwt = JWTManager(app) 
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:krishna123@localhost/sample'
+app.config['JWT_SECRET_KEY'] = 'Krishna#9795 ' 
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+
+class User_log(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True)
+    password = db.Column(db.String(80))
+    
+    def __init__(self,username,password):
+        self.username=username
+        self.password=password
+        
+        
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.json.get('username')
+    password = request.json.get('password')
+
+    if not username or not password:
+        return jsonify({'message': 'Username and password are required.'}), 400
+
+    present_user = User_log.query.filter_by(username=username).first()
+    if present_user:
+        return jsonify({'message': 'Username already exists. Please choose a different username.'}), 400
+    new_user = User_log(username, password)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'message': 'User registered successfully'})
+
+@app.route('/login',methods=['POST'])
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+
+    user = User_log.query.filter_by(username=username).first()
+
+    if not user or user.password != password:
+        return jsonify({'message': 'Invalid username or password.'}), 401
+
+    access_token = create_access_token(identity=user.id)
+    return jsonify({'access_token': access_token}), 200
+        
+
+    
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50))
@@ -30,6 +77,7 @@ class User(db.Model):
         
 #for reading the data in the fields
 @app.route('/users', methods=['GET'])
+@jwt_required()
 def get_users():
     users = User.query.all()
     result = []
