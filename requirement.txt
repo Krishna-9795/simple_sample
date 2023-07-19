@@ -3,3 +3,4 @@ Flask-SQLAlchemy==3.0.5
 flask_requests==0.0.14
 pymysql==1.1.0
 cryptography==41.0.2
+flask-jwt-extended==4.5.2
