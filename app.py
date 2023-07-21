@@ -1,5 +1,4 @@
 from flask import Flask ,jsonify, request
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 import uuid
@@ -7,25 +6,12 @@ from werkzeug.utils import secure_filename
 import datetime
 from flask_jwt_extended import JWTManager, jwt_required,create_access_token,get_jwt_identity
 from datetime import timedelta
+from tests import User ,User_log ,app,db,jwt
 
-app=Flask(__name__)
-db=SQLAlchemy()
-
-jwt = JWTManager(app) 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:krishna123@localhost/sample'
 app.config['JWT_SECRET_KEY'] = 'Krishna#9795 ' 
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
-
-class User_log(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(80))
-    
-    def __init__(self,username,password):
-        self.username=username
-        self.password=password
-        
         
 @app.route('/register', methods=['POST'])
 def register():
@@ -57,26 +43,6 @@ def login():
     access_token = create_access_token(identity=user.id)
     return jsonify({'access_token': access_token}), 200
         
-
-    
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True)
-    first_name = db.Column(db.String(50))
-    last_name= db.Column(db.String(50))
-    mobile=db.Column(db.String(20),unique=True)
-    created_at=db.Column(db.DateTime, server_default=db.func.now())
-    updated_at=db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
-    image_url=db.Column(db.String(100))
-    
-    def __init__(self,username,first_name, last_name, mobile, image_url=None):
-        self.username = username
-        self.first_name = first_name
-        self.last_name = last_name
-        self.mobile = mobile
-        self.image_url = image_url
-
-
 
 @app.route('/profile', methods=['GET'])
 @jwt_required()
@@ -125,6 +91,7 @@ def get_users():
 
 #creating an id and entering the details      
 @app.route('/users/create', methods=['POST'])
+@jwt_required()
 def create_user():
     data = request.get_json()
     username=data.get('username')
