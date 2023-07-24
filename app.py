@@ -6,7 +6,8 @@ from werkzeug.utils import secure_filename
 import datetime
 from flask_jwt_extended import JWTManager, jwt_required,create_access_token,get_jwt_identity
 from datetime import timedelta
-from tests import User ,User_log ,app,db,jwt
+
+from models import User ,User_log ,app,db,jwt
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:krishna123@localhost/sample'
