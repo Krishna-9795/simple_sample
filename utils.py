@@ -1,7 +1,11 @@
 from app import app,db
 from flask import request , jsonify
-import jwt
 from models import User ,User_log 
+import os
+import uuid
+from werkzeug.utils import secure_filename 
+import datetime
+from flask_jwt_extended import JWTManager, jwt_required,create_access_token,get_jwt_identity
 
 #for registering
 def register():
