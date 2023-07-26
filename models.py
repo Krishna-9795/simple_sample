@@ -2,9 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, jwt_required,create_access_token,get_jwt_identity
 
-app=Flask(__name__)
-db=SQLAlchemy()
-jwt = JWTManager(app) 
+from app import db
 
 
 class User_log(db.Model):
