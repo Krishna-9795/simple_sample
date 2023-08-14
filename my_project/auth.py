@@ -1,10 +1,11 @@
 from flask_jwt_extended import create_access_token, get_jwt_identity
 from models import User, User_log
 from flask import request ,jsonify
-import app
+
 
 
 def register(username,password):
+    from db import db
     username = request.json.get('username')
     password = request.json.get('password')
 
@@ -16,8 +17,8 @@ def register(username,password):
         return jsonify({'message': 'Username already exists. Please choose a different username.'}), 400
 
     new_user = User_log(username, password)
-    app.db.session.add(new_user)
-    app.db.session.commit()
+    db.session.add(new_user)
+    db.session.commit()
     return jsonify({'message': 'User registered successfully'})
     pass
 def login(username,password):
@@ -31,6 +32,7 @@ def login(username,password):
     pass
 # Other authentication-related functions
 def update_user(user_id):
+    from db import db
     data = request.get_json()
     user = User.query.get(user_id)
     if not user:
@@ -42,7 +44,7 @@ def update_user(user_id):
     user.last_name = data.get('last_name', user.last_name)
     user.mobile = data.get('mobile', user.mobile)
     
-    app.db.session.commit()
+    db.session.commit()
 
     result = {
         'id': user.id,
@@ -57,14 +59,16 @@ def update_user(user_id):
     pass
 #delete function
 def delete_user(user_id):
+    from db import db
     user = User.query.get(user_id)
     if not user:
         return jsonify(error='User not found'), 404
-    app.db.session.delete(user)
-    app.db.session.commit()
+    db.session.delete(user)
+    db.session.commit()
     return jsonify(message='User deleted'), 200
     pass       
 def create_user():
+    from db import db
     data = request.get_json()
     username=data.get('username')
     first_name = data.get('first_name')
@@ -77,8 +81,8 @@ def create_user():
         return jsonify(error='Missing required fields'), 400
 
     new_user = User(username=username,first_name=first_name, last_name=last_name, mobile=mobile, image_url=image_url)
-    app.db.session.add(new_user)
-    app.db.session.commit()
+    db.session.add(new_user)
+    db.session.commit()
     
     result = {
         'id': new_user.id,

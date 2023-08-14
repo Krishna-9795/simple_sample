@@ -1,7 +1,7 @@
 from flask import Flask
 from datetime import timedelta
 from flask_jwt_extended import JWTManager
-from flask_sqlalchemy import SQLAlchemy
+from db import db
 
 
 
@@ -9,7 +9,7 @@ app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:krishna123@localhost/sample'
 app.config['JWT_SECRET_KEY'] = 'Krishna#9795 ' 
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
-db=SQLAlchemy()
+
 jwt = JWTManager(app) 
 
 db.init_app(app)

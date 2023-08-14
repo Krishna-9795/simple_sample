@@ -11,7 +11,7 @@ def app_routes(app,db):
         return auth.register("username","password")
     @app.route('/login',methods=['POST'])
     def login_user():
-        return auth.login()
+        return auth.login("username","password")
 
             
 
