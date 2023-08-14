@@ -1,6 +1,4 @@
 from app import db
-
-
 class User_log(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True)
@@ -8,9 +6,7 @@ class User_log(db.Model):
     
     def __init__(self,username,password):
         self.username=username
-        self.password=password
-    
-    pass  
+        self.password=password 
 
 
 class User(db.Model):
@@ -31,4 +27,3 @@ class User(db.Model):
         self.mobile = mobile
         self.image_url = image_url
         
-    pass
